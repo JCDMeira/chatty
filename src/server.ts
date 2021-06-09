@@ -1,7 +1,7 @@
 import express from "express";
 import { routes } from "./routes";
 
-// # Arquivos próprios
+// # own files
 import "./database";
 
 const app = express();
