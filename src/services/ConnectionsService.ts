@@ -38,6 +38,15 @@ class ConnectionsService {
 
         return connection;
     }
+
+    async findAllWithoutAdin() {
+        const connections = await this.ConnectionsRepository.find({
+            where: { admin_id: null},
+            relations: ["user"],
+        })
+
+        return connections;
+    }
 }
 
 export { ConnectionsService };
