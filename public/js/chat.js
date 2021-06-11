@@ -1,3 +1,5 @@
+let socket_admin_id = null;
+
 document.querySelector("#start_chat").addEventListener("click", (event) => {
     const socket = io();
 
@@ -29,7 +31,7 @@ document.querySelector("#start_chat").addEventListener("click", (event) => {
         let template_client = document.getElementById("message-user-template").innerHTML;
         let template_admin = document.getElementById("admin-template").innerHTML;
 
-        messages.forEach(messages => {
+        messages.forEach(message => {
             if(message.admin_id === null){
                 const rendered = Mustache.render(template_client, {
                     message: message.text,
@@ -46,4 +48,19 @@ document.querySelector("#start_chat").addEventListener("click", (event) => {
             }
         });
     });
+
+    socket.on("admin_send_to_client", message => {
+        socket_admin_id = message.socket_id;
+
+        const template_admin = document.getElementById("admin-template").innerHTML;
+
+        const rendered = Mustache.render(template_admin, {
+            message_admin: message.text,
+        })
+
+        document.getElementById("messages").innerHTML += rendered;
+    });
+
 });
+
+
