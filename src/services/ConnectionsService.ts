@@ -1,4 +1,4 @@
-import { getCustomRepository, Repository} from "typeorm";
+import { getCustomRepository, Repository } from "typeorm";
 
 // # Own files
 import { ConnecionsRepository } from "../repositories/ConnectionsRepository";
@@ -12,40 +12,69 @@ interface IConnetionCreate {
 };
 
 class ConnectionsService {
-    private ConnectionsRepository: Repository<Connection>
+    private connectionsRepository: Repository<Connection>
 
     constructor() {
-        this.ConnectionsRepository = getCustomRepository(ConnecionsRepository);
+        this.connectionsRepository = getCustomRepository(ConnecionsRepository);
     }
 
-    async create({socket_id, user_id, admin_id, id}: IConnetionCreate){
-        const connetion = this.ConnectionsRepository.create({
+    async create({ socket_id, user_id, admin_id, id }: IConnetionCreate) {
+        const connetion = this.connectionsRepository.create({
             socket_id,
             user_id,
             admin_id,
             id
         });
 
-        await this.ConnectionsRepository.save(connetion);
+        await this.connectionsRepository.save(connetion);
 
         return connetion;
     }
 
-    async findByUserId(user_id: string){
-        const connection = await this.ConnectionsRepository.findOne({
+    async findByUserId(user_id: string) {
+        const connection = await this.connectionsRepository.findOne({
             user_id,
         });
 
         return connection;
     }
 
-    async findAllWithoutAdin() {
-        const connections = await this.ConnectionsRepository.find({
-            where: { admin_id: null},
+    async findAllWithoutAdmin() {
+        const connections = await this.connectionsRepository.find({
+            where: { admin_id: null },
             relations: ["user"],
         })
 
         return connections;
+    }
+
+    async findBySocketID(socket_id: string) {
+        const connection = await this.connectionsRepository.findOne({
+            socket_id,
+        });
+
+        return connection;
+    }
+
+    async updateAdminID(user_id: string, admin_id: string) {
+        await this.connectionsRepository
+            .createQueryBuilder()
+            .update(Connection)
+            .set({ admin_id })
+            .where("user_id = :user_id", {
+                user_id,
+            })
+            .execute();
+    }
+
+    async deleteBySocketId(socket_id: string) {
+        await this.connectionsRepository
+            .createQueryBuilder()
+            .delete()
+            .where("socket_id = :socket_id", {
+                socket_id,
+            })
+            .execute();
     }
 }
 
